@@ -6,16 +6,23 @@ app = Flask(__name__)
 
 
 def get_random_slice(directory, max_chars=5000):
-    for filename in os.listdir(directory):
-        with open(os.path.join(directory, filename), "r") as file:
-            text = file.read()
-            start_index = random.randint(0, len(text) - max_chars)
-            return text[start_index : start_index + max_chars]
+    filename = random.choice(os.listdir(directory))
+    with open(os.path.join(directory, filename), "r") as file:
+        text = file.read()
+        if len(text) <= max_chars:
+            return text
+
+        start_index = random.randint(0, len(text) - max_chars)
+        return text[start_index : start_index + max_chars]
 
 
 @app.route("/api/random-text", methods=["GET"])
 def random_text():
-    text = get_random_slice("processed")
+    x = random.uniform(0, 1)
+    if x < 0.6:
+        text = get_random_slice("processed")
+    else:
+        text = get_random_slice("scraped")
     return jsonify({"text": text})
 
 
