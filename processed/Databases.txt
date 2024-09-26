@@ -1,0 +1,47 @@
+1 - Introduction to database engines
+We start by considering what a database engine is, how they have evolved into their present form, and how they are typically architected. We will also consider the likely future of database engines given trends in hardware and business use cases.
+Suggested prework: read Architecture of a Database System and watch Michael Stonebreaker’s retrospective on his paper One Size Fits All - An Idea Whose Time Has Come and Gone.
+Further study: PostgreSQL manual
+2 - Sorting, hashing and single table queries
+How does a database engine actually execute a query? This class attempts to provide an intuition, focusing on queries over a single table, leaving joins for the next class.
+Suggested prework: watch CS186 lectures Sorting and Hashing and Single-Table Queries.
+Further study: R&G sections 13 and 5
+3 - Joins
+This class covers common algorithms for performing joins, focusing on hash join and sort-merge join.
+Suggested prework: watch CS186 lecture on Join Algorithms Further study:
+Join Processing in Database Systems with Large Main Memories
+R&G chapter 14.4
+
+
+4 - Indexes
+Without indexes, it would be impossible to efficiently querying significant amounts of data. This class covers their typical implementation.
+Suggested prework: watcch CS186 lecture Tree-Structured Indexes Further study:
+R&G sections 8 and 10 Website: Use the index, Luke
+5 - Relational algebra and the relational model
+Relational models, relational query languages and the underlying relational algebra provide us with powerful tools for representing our data and its relationships. They also simplify the job that database engine implementers have of anticipating the needs of users and as we will see, optimize their queries.
+Suggested prework: watch CS186 lecture Relational Algebra
+What Goes Around Comes Around sections 1-4
+System R: Relational Approach to Database Management R&G chapter 4.2
+6 - Query optimization
+Database engines do a remarkable job of devising close-to-optimal query plans. This class starts to explore how.
+Suggested prework: watch CS186 lectures Relational Query Optimization and continued
+Further study:
+Access Path Selection in a Relational Database Management System
+7 - Transactions and concurrency
+
+
+This class introduces the topic of concurrency control and how it is that databases are able to provide for isolated transactions.
+Suggested prework: read Concurrency Control and Recovery Further study:
+On Optimistic Methods for Concurrency Control
+Concurrency Control Performance Modeling: Alternatives and Implications
+8 - Distributed databases
+This class covers a growing trend in databases of prioritizing availability over isolation, focusing on Amazon’s Dynamo and its descendants Cassandra and Riak.
+Suggested prework: read Red Book chapter 6 introduction and the Dynamo paper.
+9 - Large-scale dataflow engines
+MapReduce was a radical departure from conventional data processing systems. While short-lived, it is having an impact through spiritual successor technologies such as Spark. Our final class explores this world of flexible, distributed data flow engines.
+Suggested prework: read Peter Bailis’ introduction in the Red Book and watch Michael Stonebreaker: Big data is (at least) four different problems
+Further study:
+MapReduce: Simplified Data Processing on Large Clusters (original MapReduce paper)
+Resilient Distributed Databases (original Spark paper)
+         4 of 4
+   

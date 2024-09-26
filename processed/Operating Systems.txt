@@ -1,0 +1,127 @@
+# Introduction
+This first module is designed to provide a first exposure to three of the most important responsibilities of the operating system: enabling multiple tasks to run on the same CPU, providing a virtual address space to processes, and abstracting over persistent storage by way of a file system. We also use it as an opportunity to briefly discuss some core concepts like system calls and context switches, and use tools like strace. All of these topics will be covered in more depth as we go. These problems should provide some context and serve as a warmup.
+
+Problems
+CPU timing  measure time spent in the kernel vs user space (55:06)
+Stack overflow  write a short program to cause a stack overflow, and closely watch what happens (42:12)
+Byte write  write a byte at a time to a file, and log whenever the file takes more space on disk (22:46)
+Seminars
+
+An introduction to operating systems, exploring syscalls as the interface  (1:22:43)
+Explainers
+What happens during a context switch? (07:28)
+What is POSIX compliance? (05:05)
+Why time-sharing operating systems were such a big deal (05:46)
+The early history of Unix (07:34)
+Learning how to better use man pages (09:00)
+What exactly is the kernel? (04:19)
+Pre-emptive multitasking and the timer interrupt (06:48)
+A brief overview of the flavors of Unix, (ie why your grep may be different to mine) (12:39)
+A brief introduction to strace and ltrace (17:03)
+What exactly is a syscall, and how is it not a C stdlib function? (06:19)
+What is "the stack"? (simple explanation) (05:43)
+What is "the stack"? (detailed explanation) (16:21)
+The motivation for address space layout randomization (04:41)
+
+
+# Programs and Processes
+From the perspective of the operating system a "program" is some data in storage that conforms to the system’s executable file format. A process is a running program and perhaps the most important abstraction we will investigate during this course. Once processes are running, a core responsibility of the operating system is to manage process lifecycles, including scheduling themTechnically on a system that supports threads, it is a "thread" that is scheduled. You can think of a process as "having" one or more threads of execution which can be scheduled independently while sharing the same address space, or equivalently you could use Linux's terminology of a "task" being a schedulable entity which may or may not share memory mappings with another task. onto the CPU when appropriate.
+
+This series of problem covers everything from the expected program structure, the operating system's role in loading and executing programs as processes, and the process life cycle. As part of this, we will also cover exceptional control flow, as the mechanism required to run both an operating system and user processes securely on the same machine. Scheduling is covered in the next section.
+
+For supporting material, we suggest chapters 4 to 8 of OSTEP, particularly chapters 4 (Processes) and 5 (Process API). For those using CS:APP, we suggest chapters 7 ("Linking") and 8 ("Exceptional Control Flow").
+
+Problems
+Signalbox use signals to detect when your terminal window resizes (33:30)
+Signal logger   given a program that logs any received signal, trigger as many as you can! (1:09:06)
+Custom shell: basic execution write a very basic shell program that executes child processes (57:32)
+Custom shell: pipes extend your shell to support pipes (1:06:29)
+Custom shell: job control extend your shell to support background jobs and job control (1:39:46)
+Seminars
+
+Exploring the process lifecycle (1:16:19)
+Explainers
+Pipelines don't execute sequentially! (04:47)
+Details of using pipes (11:08)
+Understanding process groups and sessions (13:14)
+Brief overview of the process lifecycle (13:01)
+Fork details: COW and vfork (10:04)
+Exploring processes by considering ps output (17:42)
+I/O multiplexing: select, poll, epoll and kqueue (10:47)
+Foreground and background process groups (04:59)
+What exactly is a process? (03:48)
+What is a signal? (12:19)
+Is everything a file in Unix? (22:06)
+Internal representations of a process in Unix V6 and Linux (21:54)
+
+
+# Threads, Concurrency and Scheduling
+A process is a running instance of a program, but what if we wish to have more than one thread of execution, for instance to utilize multiple CPU cores? We could create multiple processes, but this would make it hard for each to communicate, as they would each have their own address space. Threads were created as a lightweight mechanism to support multiple executing "units" that share a single address space.
+
+In this module, we explore the operating system's thread API, but also use it as an excuse to consider the idea of concurrent programming more broadly, including the hazards of race conditions and deadlocks. The problems should both help you understand the operating system thread model and concurrency primitives, and also develop the skill of concurrent programming.
+
+This is also the context in which we consider scheduling, although we also could have done so in the previous module on processes, since scheduling is and important concern from the operating system's perspective even if each process is single-threaded. However as a user, many scheduling considerations are more relevant when considering multi-threaded programs, and it allows for more interesting practice problems!
+
+For supplementary material, we suggest OSTEP chapters 26: Concurrency and Threads, 27: Thread API and 28: Locks.
+
+Problems
+Threaded counter  fix the simplest possible concurrency bug (18:09)
+Multi-threaded mergesort  practice concurrent programming by speeding up a merge sort (58:24)
+Multi-threaded fizzbuzz make the classic interview question a little more fun with concurrency! (25:17)
+Ring buffer implement a job queue with concurrent readers and writers (1:09:21)
+Thread race visualize a race between multiple threads to complete independent tasks
+Unfair thread race  help one thread "cheat" by adjusting the scheduler priority
+
+Seminars
+The motivation for threads, contrasted with I/O multiplexing (38:12)
+What is a good scheduling policy? (54:48)
+Explainers
+Understanding race conditions (14:44)
+Starting and waiting on POSIX threads (04:39)
+Processes, threads and lightweight threads (18:22)
+
+
+# Virtual memory
+You will have already encountered many aspects of virtual memory in the previous modules, but in this one we'll do a deeper dive into the various hardware and software concepts involved. We'll also examine the interface presented by the OS to manage and manipulate the virtual memory subsystem, and consider how these can be used to increase performance and in some cases simplify persistence.
+
+As supplementary material, we suggest OSTEP chapters 13 Address Spaces and 18 Paging.
+
+Problems
+Basic mmap  use a shared memory mapping to communicate between two processes (17:39)
+Shared memory stream  speed up data transfer between to processes by using shared memory (54:04)
+Custom malloc implement your own memory allocator to better understand memory management (1:26:51)
+Explainers
+The historical context for today's virtual memory system (38:19)
+The basic idea behind paging (02:52)
+The motivation for multi-level page tables (18:27)
+Why you probably shouldn't use the default 4KiB page size (11:27)
+What is "swap memory" and is it a good idea? (11:28)
+Copy-on-write, zero-on-demand and other virtual memory tricks (12:41)
+An overview of the mmap system call (24:00)
+A detailed view of Intel's multi-level page tables (13:29)
+
+
+# File systems
+While you may already have plenty of experience with the file system as an end user, in this module we'll focus on how abstractions like "files", and "directories" are actually implemented, and sometimes used in surprising ways.
+
+As supplementary material, we recommend OSTEP chapters 39 Files and Directories and 40 File System Implementation.
+
+Problems
+Custom ls as a first exposure to some file system APIs, write a clone of ls (36:39)
+Mystery file  find a secret message in a mysterious file (22:12)
+Custom file system  write a novelty file system with FUSE (1:01:31)
+Explainers
+What's the big idea behind file systems? (06:04)
+Some virtual files and file systems (08:18)
+Sketching out a basic file system design (23:40)
+What is an inode? (10:07)
+Virtual Machines and Containers
+Our final module covers two technologies with distinct purposes which tend to be conflated. Virtual machine monitors (or “hypervisors”) are a decades old technology for running multiple operating systems on the same machine, by providing a virtual machine interface to each of them. Containers are a higher-level, lighter weight construct for isolating groups of processes running within the same operating system.
+
+We will explore both in the following problems, including a basic implementation of containers.
+
+Problems
+Container: chroot isolate part of the filesystem, as a starting point for a container runtime (28:55)
+Container: namespaces meaningfully isolate your contained processes with Linux namespaces (1:01:59)
+Container: cgroups  use control groups to limit unwanted resource usage (32:35)
+Container: extras capabilities, system call blacklisting and other considerations (27:15)

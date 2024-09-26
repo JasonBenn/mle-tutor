@@ -1,0 +1,24 @@
+# 3 - Probability
+One of the most common applications of “counting things” is to count the possible number of states from which a choice is randomly made. This brings us to the study of probability, which we will explore in a little more depth.
+Suggested prework: LL chapter 7 Further study:
+MCS chapters 17-21
+Rosen chapter 7
+6.042J videos: probability onwards
+Website: Seeing Theory: A visual introduction to probability and statistics
+
+
+# 7 - Linear algebra crash course
+In a single class we will attempt to get to the root of a vast field of study: linear algebra, the basis (ha) of computer graphics, machine learning among other applications in computer science.
+Suggested prework: watch Essence of linear algebra videos 1-7 Further study:
+Blog post: An Intuitive Guide to Linear Algebra
+Interactive online book immersive linear algebra
+Gilbert Strang’s excellent but non-interactive book Introduction to Linear Algebra Gilbert Strang’s excellent MIT lecture series
+
+
+# 8 - Cryptography
+In this class we dip our toes into number theory, to explore one of its most famous applications: public key cryptography.
+Suggested prework: LL chapters 15 and 16 Further study:
+MCS chapter 9
+6.042J videos: number theory 1 and 2
+Rosen chapter 4
+Khan Academy course: Journey into cryptography Book: A Course in Number Theory and Cryptography

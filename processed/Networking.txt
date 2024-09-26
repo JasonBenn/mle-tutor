@@ -1,0 +1,81 @@
+RECOMMENDED RESOURCES
+While it’s possible to complete this course simply by participating in classes, you will see the most value if you do the suggested prework and investigate some of the “further study” references.
+Our recommended text for the course is Kurose and Ross Computer Networking: A Top-Down Approach (referred to as K&R below). The content changes very little from one edition to another, so the fifth edition (or even fourth, at a pinch) is sufficient and likely much cheaper to buy second hand. The chapter references below are for the fifth edition.
+For those who prefer video lectures, we suggest Stanford’s Introduction to Computer Networking available via Lagunita, their MOOC platform.
+
+There is also a worthwhile series of very short videos on miscellaneous networking topics by a former University of Buffalo lecturer. These may be a good place to look for a definition or explanation of a specific topic or protocol.
+Finally, some of our suggested further study resources are protocol specifications (particularly RFCs) and papers. These can be incredibly valuable, as networking is a dynamic field where practice often precedes theory and shorter non- academic material better conveys the motivation for a given set of decisions.
+
+
+# 1 - The big picture: layers of protocols
+Our first class explores the history of computer networks and presents the layered model. We and the K&R book both use a simplified 5-layer version of the OSI 7- layer networking model.
+Suggested prework: read chapter 1 of K&R, particularly 1.5 (Protocol Layers) and 1.7 (History of Computer Networking)
+Further study:
+Paper: OSI Reference Model—The ISO Model of Architecture for Open
+Systems Interconnection
+Website: Brief History of the Internet
+Book: Where Wizards Stay Up Late: The Origins Of The Internet
+
+
+# 2 - Application layer: HTTP
+Commonly called the web, HTTP has become a ubiquitous protocol employed well beyond its original purpose of delivering HTML pages to browsers. This class covers the HTTP protocol in depth, given its degree of usefulness.
+Suggested prework: chapters 2.1-2.2 of K&R Further study:
+RFC 1945 (HTTP/1.0)
+RFC 2616 (HTTP/1.1)
+RFC 7540 (HTTP/2)
+Website: HTTP/2 FAQs
+Video: Yesterday's perf best-practices are today's HTTP/2 anti-patterns
+
+
+# 3 - Application layer: DNS, SMTP, FTP and others
+There are perhaps 100 or more application layer protocols. They are common enough that you may be involved in developing one at some point. For this lesson, we have selected three to cover three in detail.
+Suggested prework: chapters 2.3-2.5 of K&R Further study:
+Paper: Development of the Domain Name System RFC 1034 and RFC 1035
+RFC 5321 (SMTP)
+RFC 1939 (POP3)
+RFC 3501 (IMAP) RFC 959 (FTP)
+
+
+# 4 - Transport layer: TCP and UDP
+This class covers the important transport layer, the tradeoffs between TCP and UDP, and how TCP guarantees reliability and ordering.
+Suggested prework: chapter 3 of K&R, particularly 3.3 and 3.5 Further study:
+Paper: A Protocol for Packet Network Intercommunication (Cerf and Kahn's early paper)
+RFC 793 (TCP)
+RFC 768 (UDP)
+Video: QUIC: next generation multiplexed transport over UDP
+Draft protocol: QUIC: A UDP-Based Secure and Reliable Transport for HTTP/2
+Oral history interview with Bob Kahn
+
+
+# 5 - Network layer: the internet protocol and routing
+This class covers the internet protocol itself, the overall problems of addressing and routing, and how routing tables are maintained without manual intervention.
+Suggested prework: chapter 4 of K&R, particularly 4.4 Further study:
+RFC 791 (IPv4) RFC 2460 (IPv6) RFC 4443 (ICMPv6)
+
+
+# 6 - The link layer and local area networks
+Having proceeded from applications down through the transport and network layers, we still need to account for how data is reliably transmitted via physical media like wires and air. This class covers ethernet and 802.11 (Wi-Fi) as well MAC, ARP and other important protocols at the link layer.
+Suggested prework: chapter 5 of K&R, particularly 5.1, 5.4 and 5.5 Further study:
+RFC 826 (ARP)
+IEEE 802.11 standard
+Video: Oral history of Bob Metcalfe inventor of Ethernet
+
+
+# 7 - Multimedia streaming and realtime communication
+Netflix streaming accounts for approximately a third of peak internet traffic in the US. Add that to Youtube and other video streaming, as well as Skype, Facetime and similar realtime communication platforms, and it's clear that most of the internet is dedicated to audio and video streaming, not HTML documents. This class explores these applications and the technologies required to deliver them effectively.
+Suggested prework: K&R chapters 7.1-7.3 Further study:
+RFC 3550 (RTP)
+ISO standard for DASH
+Video: Scaling the Netflix Global CDN WebRTC draft specification
+
+
+# 8 - Security
+Security was not a first class concern of the pioneers of computer networking, and so is not at the core of its most important protocols, so much as retrofitted around them. It is however a critically important consideration in using computer networks, so this class covers the means to which we go to secure internet communication at every layer, including SSL/TLS, PGP, IPSec and WPA.
+Suggested prework: K&R chapters 8.2 and 8.5 Further study:
+Khan Academy cryptography course
+Book: Applied Cryptography by Bruce Schneier RFC 5246 (TLS)
+
+
+# 9 - The future of networking
+Computer networking is an incredibly dynamic domain, driven by significant commercial imperatives, consumer demand, and a vibrant research community. We use our final class to explore some current developments toward a potential future for networking technologies.
+Suggested prework: watch Van Jacobson on A New Way to look at Networking and read the IPFS white paper

@@ -1,0 +1,47 @@
+1 - Introduction to distributed systems
+Our first class will introduce the important themes and concepts of distributed systems, and provide an opportunity to review relevant operating systems and networking considerations.
+Suggested prework: Distributed Systems chapter 1.1-1.2 Further study:
+Video: 6.824 lecture 1
+Online textbook: Operating Systems: Three Easy Pieces Textbook: Computer Networking: A Top Down Approach
+2 - Communication models and patterns
+Distribution implies communication. This class explores how that is typically done, building up from sockets to Remote Procedure Call and streaming models, and patterns such as fanout and pub/sub.
+Suggested prework: Distributed Systems 4.1-4.4 Further study:
+Video: 6.824 lecture 2 The ZeroMQ Guide
+3 - Naming and name services
+The perennial difficulty of “naming things” is exacerbated in distributed systems by having larger implicitly shared namespaces and by potentially desiring to distribute the naming system itself. We explore these issues and consider DNS as a case study.
+Suggested prework: Distributed Systems 5.1-5.3 (we will also revisit 5.2.3 in more detail later)
+
+Further study:
+Paper: Development of the Domain Name System
+Paper: Naming and Binding of Objects
+4 - Integrity and Security
+The core set of internet communication protocols provide no protection against forgery and no mechasim for ensuring confidentiality. Distributed systems that run on untrusted networks (such as the Internet) must incorporate protocol security extensions (IPSEC, SSL, DNSEC etc) or go end-to-end and build secruity into the system itself.
+Suggested prework: Distributed Systems 9.1-9.4 Further study:
+What is Certificate Transparency?
+5 - Consensus: Paxos and Raft
+Consensus is a fundamental problem for fault tolerant systems. A cluster of servers can be presented to users as being available and reliable overall, even when some of those servers fail, if the others have an adequate system for agreeing on state. This class introduces the problem, briefly describes Paxos, and covers the more understandable Raft in detail. We will reconsider fault tolerance in more depth later; we cover Raft early here so that it may be used in class projects.
+Suggested prework: watch An Introduction to Raft and read the Raft paper Further study:
+Videos: 6.824 lectures 5 (Paxos) and 6 (Raft) Paper: Paxos Made Simple
+Paper: The Part Time Parliament
+
+6 - Synchronization, time and logical clocks
+Distributed processes must coordinate in order to manage shared resources and come to agreement on a world they all see from different vantage points. This is easier said than done: how can processes do the right thing at the right time if their clocks differ, and how can they synchronize their clocks if it takes time to send the synchronization message?
+Suggested prework: Distributed Systems 6.1-6.2
+Videos: Tim Berglund on the Network Time Protocol and vector clocks
+Paper: Time, Clocks, and the Ordering of Events in a Distributed System (a classic) Paper: Internet Time Synchronization: the Network Time Protocol
+Book: Introduction to Distributed Algorithms
+7 - Replication and fault tolerance in depth
+Building on our introduction to replication and fault tolerance in our earlier class on consensus algorithms, we consider issues such as consistency guarantees for replicas, and levels of fault tolerance.
+Suggested prework: Distributed Systems 7.1-7.3 and 8.5-8.6 Further study:
+Videos: 6.824 lectures 3/4 (replication) and 12 (eventual consistency) Paper: The Dangers of Replication and a Solution
+Paper: Practical Byzantine Fault Tolerance
+
+8 - Peer-to-peer systems
+Peer-to-peer networks are large scale replication systems, created to overcome bottlenecks in traditional client/server file sharing systems. In turn they face their own challenges, such as how to search for requested data on the network, how to adapt to users joining and leaving, and novel attack vectors for bad actors. In this class we consider some of the architectures that failed in production, what it was that enabled BitTorrent to succeed technically, and principles for reapply these lessons to other peer-to-peer systems.
+
+Suggested prework: Distributed Systems 5.2 and the Chord paper Further study:
+Videos: Steven Gordon on BitTorrent and distributed hash tables
+Kademlia: A Peer-to-peer Information System Based on the XOR Metric (used by BitTorrent) IPFS whitepaper
+How the Bitcoin protocol actually works
+      5 of 5
+   
