@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Random Text and Flashcard API
-  description: An API that provides random text and allows interaction with flashcards in Mochi.
+  description: An API that provides random text and allows interaction with flashcards in Mochi. Use LaTeX where helpful. Inline expressions are wrapped with one $, block-level expressions are wrapped with two $$.
   version: 1.2.0
 servers:
   - url: https://tutor.mleclub.com
@@ -114,9 +114,10 @@ paths:
 
   /api/cards:
     post:
-      operationId: createCardInMochi
+      operationId: createCard
       summary: Create a flashcard in Mochi.
       description: Creates a flashcard in Mochi using the specified deck and card content.
+      x-openai-isConsequential: false
       requestBody:
         required: true
         content:
@@ -161,20 +162,27 @@ paths:
       operationId: updateCard
       summary: Update a specific flashcard.
       description: Updates a flashcard's content in Mochi using the card ID.
+      x-openai-isConsequential: false
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/TutorCard"
-                - type: object
-                  properties:
-                    card_id:
-                      type: string
-                      description: The ID of the card to update.
-                  required:
-                    - card_id
+              type: object
+              properties:
+                card_id:
+                  type: string
+                  description: The ID of the card to update.
+                front:
+                  type: string
+                  description: The updated markdown content of the front of the card.
+                back:
+                  type: string
+                  description: The updated markdown content of the back of the card.
+              required:
+                - card_id
+                - front
+                - back
       responses:
         "200":
           description: Card updated successfully
@@ -185,10 +193,12 @@ paths:
         "500":
           description: Internal Server Error
 
-    delete:
+  /api/card/delete:
+    post:
       operationId: deleteCard
       summary: Delete a specific flashcard.
       description: Deletes a flashcard in Mochi using the card ID.
+      x-openai-isConsequential: false
       requestBody:
         required: true
         content:

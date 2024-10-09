@@ -8,7 +8,7 @@ import random
 
 import requests
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 
 # Load environment variables from .env file
 load_dotenv()
@@ -84,7 +84,7 @@ def create_card():
 
 @app.route("/api/card", methods=["GET"])
 def get_card():
-    data = request.get_json()
+    data = json.loads(request.get_data(as_text=True))
     response = requests.get(f"https://app.mochi.cards/api/cards/{data['card_id']}", auth=(os.getenv("MOCHI_API_KEY"), ""))
 
     if response.status_code not in [201, 200]:
@@ -94,7 +94,7 @@ def get_card():
 
 @app.route("/api/card", methods=["PUT"])
 def update_card():
-    data = request.get_json()
+    data = json.loads(request.get_data(as_text=True))
     mochi_data = {"content": data.get("front") + "\n---\n" + data.get("back")}
     response = requests.post(
         f"https://app.mochi.cards/api/cards/{data['card_id']}", json=mochi_data, auth=(os.getenv("MOCHI_API_KEY"), "")
@@ -105,10 +105,11 @@ def update_card():
     return jsonify({"response": response.text}), 200
 
 
-@app.route("/api/card", methods=["DELETE"])
+@app.route("/api/card/delete", methods=["POST"])
 def delete_card():
-    data = request.get_json()
+    data = json.loads(request.get_data(as_text=True))
     response = requests.delete(f"https://app.mochi.cards/api/cards/{data['card_id']}", auth=(os.getenv("MOCHI_API_KEY"), ""))
+    print(response.text)
 
     if response.status_code not in [201, 200]:
         return jsonify({"error": response.text}), 500
@@ -117,7 +118,12 @@ def delete_card():
 
 @app.route("/api/privacy", methods=["GET"])
 def privacy_policy():
-    return open("privacy-policy.txt", "r").read()
+    return open("static/privacy-policy.txt", "r").read()
+
+
+@app.route("/api/openai-schema.yaml", methods=["GET"])
+def openai_schema():
+    return open("static/openai-schema.yaml", "r").read()
 
 
 if __name__ == "__main__":
