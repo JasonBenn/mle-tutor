@@ -1,0 +1,208 @@
+openapi: 3.1.0
+info:
+  title: Random Text and Flashcard API
+  description: An API that provides random text and allows interaction with flashcards in Mochi.
+  version: 1.2.0
+servers:
+  - url: https://tutor.mleclub.com
+    description: Main server for the API
+components:
+  schemas:
+    TutorCard:
+      type: object
+      properties:
+        front:
+          type: string
+          description: The markdown content of the front of the card.
+        back:
+          type: string
+          description: The markdown content of the back of the card.
+        deck:
+          type: string
+          description: The deck in which to create the flashcard.
+          enum:
+            - MACHINE_LEARNING
+            - DISTRIBUTED_SYSTEMS
+            - OPERATING_SYSTEMS
+            - SYSTEM_DESIGN
+            - PYTHON
+            - JAVASCRIPT
+            - NETWORKING
+            - ARCHITECTURE
+            - DATABASES
+            - PYTORCH
+      required:
+        - front
+        - back
+        - deck
+
+    MochiCard:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the card.
+        content:
+          type: string
+          description: The combined content of the front and back of the card.
+        deck-id:
+          type: string
+          description: The identifier of the deck to which the card belongs.
+        pos:
+          type: string
+          description: Position of the card within the deck.
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the card.
+        name:
+          type: string
+          nullable: true
+          description: Name of the card (if any).
+        references:
+          type: array
+          items:
+            type: string
+          description: References related to the card.
+        reviews:
+          type: array
+          items:
+            type: string
+          description: Reviews related to the card.
+        new?:
+          type: boolean
+          description: Indicates if the card is new.
+        archived?:
+          type: boolean
+          description: Indicates if the card is archived.
+        template-id:
+          type: string
+          nullable: true
+          description: The template ID associated with the card.
+        created-at:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+              description: The creation date of the card.
+        updated-at:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+              description: The last updated date of the card.
+
+paths:
+  /api/random-text:
+    get:
+      operationId: getRandomText
+      summary: Get a random text.
+      description: Fetches a randomly generated text string.
+      responses:
+        "200":
+          description: A randomly generated text
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "This is a random text."
+        "500":
+          description: Internal Server Error
+
+  /api/cards:
+    post:
+      operationId: createCardInMochi
+      summary: Create a flashcard in Mochi.
+      description: Creates a flashcard in Mochi using the specified deck and card content.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TutorCard"
+      responses:
+        "201":
+          description: Card created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MochiCard"
+        "400":
+          description: Invalid deck specified
+        "500":
+          description: Internal Server Error
+
+  /api/card:
+    get:
+      operationId: getCard
+      summary: Retrieve a specific flashcard.
+      description: Fetches details of a flashcard from Mochi using the card ID.
+      parameters:
+        - in: query
+          name: card_id
+          schema:
+            type: string
+          required: true
+          description: The ID of the card to retrieve.
+      responses:
+        "200":
+          description: Card details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MochiCard"
+        "500":
+          description: Internal Server Error
+
+    put:
+      operationId: updateCard
+      summary: Update a specific flashcard.
+      description: Updates a flashcard's content in Mochi using the card ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/TutorCard"
+                - type: object
+                  properties:
+                    card_id:
+                      type: string
+                      description: The ID of the card to update.
+                  required:
+                    - card_id
+      responses:
+        "200":
+          description: Card updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MochiCard"
+        "500":
+          description: Internal Server Error
+
+    delete:
+      operationId: deleteCard
+      summary: Delete a specific flashcard.
+      description: Deletes a flashcard in Mochi using the card ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                card_id:
+                  type: string
+                  description: The ID of the card to delete.
+              required:
+                - card_id
+      responses:
+        "200":
+          description: Card deleted successfully
+        "500":
+          description: Internal Server Error
