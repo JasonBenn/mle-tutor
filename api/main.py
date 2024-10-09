@@ -84,8 +84,11 @@ def create_card():
 
 @app.route("/api/card", methods=["GET"])
 def get_card():
-    data = json.loads(request.get_data(as_text=True))
-    response = requests.get(f"https://app.mochi.cards/api/cards/{data['card_id']}", auth=(os.getenv("MOCHI_API_KEY"), ""))
+    card_id = request.args.get("card_id")
+    if not card_id:
+        card_id = request.get_json().get("card_id")
+
+    response = requests.get(f"https://app.mochi.cards/api/cards/{card_id}", auth=(os.getenv("MOCHI_API_KEY"), ""))
 
     if response.status_code not in [201, 200]:
         return jsonify({"error": response.text}), 500
