@@ -1,10 +1,13 @@
+import base64
 from enum import Enum
 import json
+import ipdb
 from typing import Optional
 from flask import request
 from flask import Flask, jsonify
 import os
 import random
+from datetime import datetime
 
 import requests
 
@@ -31,9 +34,9 @@ def get_random_slice(directory, max_chars=5000):
 def random_text():
     x = random.uniform(0, 1)
     if x < 0.6:
-        text = get_random_slice("processed")
+        text = get_random_slice("data/processed")
     else:
-        text = get_random_slice("scraped")
+        text = get_random_slice("data/scraped")
     return jsonify({"text": text})
 
 
@@ -127,6 +130,61 @@ def privacy_policy():
 @app.route("/api/openai-schema.yaml", methods=["GET"])
 def openai_schema():
     return open("static/openai-schema.yaml", "r").read()
+
+
+def get_github_file(path):
+    response = requests.get(
+        f"https://api.github.com/repos/JasonBenn/notes/contents/Periodic/{path}",
+        headers={
+            "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "Accept": "application/vnd.github+json",
+        },
+    )
+    return base64.b64decode(response.json()["content"]).decode("utf-8")
+
+
+@app.route("/api/daily_goals", methods=["GET"])
+def daily_goals():
+    now = datetime.now()
+    day = now.strftime("%Y-%m-%d")
+    path = f"Daily/{day}.md"
+    return get_github_file(path)
+
+
+@app.route("/api/weekly_goals", methods=["GET"])
+def weekly_goals():
+    now = datetime.now()
+    week = now.isocalendar()[1]
+    year = now.year
+    path = f"Weekly/{year}-W{week}.md"
+    return get_github_file(path)
+
+
+@app.route("/api/monthly_goals", methods=["GET"])
+def monthly_goals():
+    now = datetime.now()
+    month = now.month
+    year = now.year
+    path = f"Monthly/{year}-{month:02d}.md"
+    return get_github_file(path)
+
+
+@app.route("/api/quarterly_goals", methods=["GET"])
+def quarterly_goals():
+    now = datetime.now()
+    month = now.month
+    quarter = (month - 1) // 3 + 1
+    year = now.year
+    path = f"Quarterly/{year}-Q{quarter}.md"
+    return get_github_file(path)
+
+
+@app.route("/api/yearly_goals", methods=["GET"])
+def yearly_goals():
+    year = datetime.now().year
+    path = f"Annually/{year}.md"
+    return get_github_file(path)
 
 
 if __name__ == "__main__":

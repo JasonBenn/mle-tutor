@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info:
+  title: Goals APIs
+  description: API for accessing my periodic hierarchical goals. For planning my typical day, prefer a combination of my daily and weekly goals.
+  version: 1.0.0
+servers:
+  - url: https://tutor.mleclub.com
+    description: personal server
+paths:
+  /api/daily_goals:
+    get:
+      operationId: getDailyGoals
+      summary: retrieve daily goals
+      description: fetch daily goals in plain text
+      responses:
+        "200":
+          description: Plain text of my daily goals
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/weekly_goals:
+    get:
+      operationId: getWeeklyGoals
+      summary: retrieve weekly goals
+      description: fetch weekly goals in plain text
+      responses:
+        "200":
+          description: Plain text of my weekly goals
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/monthly_goals:
+    get:
+      operationId: getMonthlyGoals
+      summary: retrieve monthly goals
+      description: fetch monthly goals in plain text
+      responses:
+        "200":
+          description: Plain text of my monthly goals
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/quarterly_goals:
+    get:
+      operationId: getQuarterlyGoals
+      summary: retrieve quarterly goals
+      description: fetch quarterly goals in plain text
+      responses:
+        "200":
+          description: Plain text of my quarterly goals
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/yearly_goals:
+    get:
+      operationId: getYearlyGoals
+      summary: retrieve yearly goals
+      description: fetch yearly goals in plain text
+      responses:
+        "200":
+          description: Plain text of my yearly goals
+          content:
+            text/plain:
+              schema:
+                type: string
