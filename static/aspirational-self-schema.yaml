@@ -7,64 +7,50 @@ servers:
   - url: https://tutor.mleclub.com
     description: personal server
 paths:
-  /api/daily_goals:
+  /api/goals:
     get:
-      operationId: getDailyGoals
-      summary: retrieve daily goals
-      description: fetch daily goals in plain text
+      operationId: goals
+      summary: Retrieve periodic goals
+      description: Fetch goals for specified periods in plain text.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                periods:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - day
+                      - week
+                      - month
+                      - quarter
+                      - year
+              required:
+                - periods
       responses:
         "200":
-          description: Plain text of my daily goals
+          description: A JSON object containing the goals for the specified periods.
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
-  /api/weekly_goals:
-    get:
-      operationId: getWeeklyGoals
-      summary: retrieve weekly goals
-      description: fetch weekly goals in plain text
-      responses:
-        "200":
-          description: Plain text of my weekly goals
+                type: object
+                properties:
+                  results:
+                    type: object
+                    description: Mapping of file paths to goal contents.
+                    additionalProperties:
+                      type: string
+                      description: Content of the goals file for the period.
+        "400":
+          description: Bad Request. Invalid period specified.
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-  /api/monthly_goals:
-    get:
-      operationId: getMonthlyGoals
-      summary: retrieve monthly goals
-      description: fetch monthly goals in plain text
-      responses:
-        "200":
-          description: Plain text of my monthly goals
-          content:
-            text/plain:
-              schema:
-                type: string
-  /api/quarterly_goals:
-    get:
-      operationId: getQuarterlyGoals
-      summary: retrieve quarterly goals
-      description: fetch quarterly goals in plain text
-      responses:
-        "200":
-          description: Plain text of my quarterly goals
-          content:
-            text/plain:
-              schema:
-                type: string
-  /api/yearly_goals:
-    get:
-      operationId: getYearlyGoals
-      summary: retrieve yearly goals
-      description: fetch yearly goals in plain text
-      responses:
-        "200":
-          description: Plain text of my yearly goals
-          content:
-            text/plain:
-              schema:
-                type: string
+                type: object
+                properties:
+                  error:
+                    type: string

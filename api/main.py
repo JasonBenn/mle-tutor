@@ -1,5 +1,6 @@
 import base64
 from enum import Enum
+from threading import Semaphore
 import json
 import ipdb
 from typing import Optional
@@ -134,7 +135,7 @@ def openai_schema():
 
 def get_github_file(path):
     response = requests.get(
-        f"https://api.github.com/repos/JasonBenn/notes/contents/Periodic/{path}",
+        f"https://api.github.com/repos/JasonBenn/notes/contents/{path}",
         headers={
             "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
             "X-GitHub-Api-Version": "2022-11-28",
@@ -144,47 +145,37 @@ def get_github_file(path):
     return base64.b64decode(response.json()["content"]).decode("utf-8")
 
 
-@app.route("/api/daily_goals", methods=["GET"])
-def daily_goals():
-    now = datetime.now()
-    day = now.strftime("%Y-%m-%d")
-    path = f"Daily/{day}.md"
-    return get_github_file(path)
-
-
-@app.route("/api/weekly_goals", methods=["GET"])
-def weekly_goals():
-    now = datetime.now()
-    week = now.isocalendar()[1]
-    year = now.year
-    path = f"Weekly/{year}-W{week}.md"
-    return get_github_file(path)
-
-
-@app.route("/api/monthly_goals", methods=["GET"])
-def monthly_goals():
-    now = datetime.now()
-    month = now.month
-    year = now.year
-    path = f"Monthly/{year}-{month:02d}.md"
-    return get_github_file(path)
-
-
-@app.route("/api/quarterly_goals", methods=["GET"])
-def quarterly_goals():
+@app.route("/api/goals", methods=["GET"])
+def goals():
+    print("goals!")
     now = datetime.now()
     month = now.month
     quarter = (month - 1) // 3 + 1
+    week = now.isocalendar()[1]
     year = now.year
-    path = f"Quarterly/{year}-Q{quarter}.md"
-    return get_github_file(path)
+    day = now.strftime("%Y-%m-%d")
 
+    periods = request.json.get("periods", [])
+    results = {}
 
-@app.route("/api/yearly_goals", methods=["GET"])
-def yearly_goals():
-    year = datetime.now().year
-    path = f"Annually/{year}.md"
-    return get_github_file(path)
+    for period in periods:
+        match period:
+            case "day":
+                path = f"Periodic/Daily/{day}.md"
+            case "week":
+                path = f"Periodic/Weekly/{year}-W{week}.md"
+            case "month":
+                path = f"Periodic/Monthly/{year}-{month:02d}.md"
+            case "quarter":
+                path = f"Periodic/Quarterly/{year}-Q{quarter}.md"
+            case "year":
+                path = f"Periodic/Annually/{year}.md"
+            case _:
+                return jsonify({"error": "Invalid period: should be any combination of [day, week, month, quarter, year]"}), 400
+
+        results[period] = get_github_file(path)
+
+    return jsonify({"results": results})
 
 
 if __name__ == "__main__":
