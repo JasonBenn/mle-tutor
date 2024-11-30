@@ -2,3 +2,6 @@ Flask
 aiohttp
 requests
 python-dotenv
+beautifulsoup4
+icalendar
+pytz

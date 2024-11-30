@@ -1,16 +1,16 @@
+from bs4 import BeautifulSoup
 import base64
 from enum import Enum
-from threading import Semaphore
 import json
-import ipdb
+from utils import async_route, get_open_mics
 from typing import Optional
-from flask import request
-from flask import Flask, jsonify
 import os
 import random
 from datetime import datetime
-
+from flask import Flask, jsonify, request
 import requests
+import asyncio
+import aiohttp
 
 from dotenv import load_dotenv  # type: ignore
 
@@ -176,6 +176,43 @@ def goals():
         results[period] = get_github_file(path)
 
     return jsonify({"results": results})
+
+
+@app.route("/api/comedy", methods=["GET"])
+@async_route
+async def get_comedy_events():
+    try:
+        async with aiohttp.ClientSession() as session:
+
+            async def fetch_and_parse(url):
+                async with session.get(url) as response:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, "html.parser")
+                    return soup.get_text(strip=True, separator="\n")
+
+            # Wrap the synchronous get_open_mics in an async function
+            async def async_get_open_mics():
+                loop = asyncio.get_event_loop()
+                return await loop.run_in_executor(None, get_open_mics)
+
+            open_mics_data, major_shows_data, small_shows_data = await asyncio.gather(
+                async_get_open_mics(),
+                fetch_and_parse("https://www.dead-frog.com/live-comedy/shows/94117/10"),
+                fetch_and_parse("https://sf.funcheap.com/category/event/event-types/comedy-event-types-event/"),
+            )
+
+            return jsonify(
+                {
+                    "events": {
+                        "open_mics": open_mics_data,
+                        "major_shows": major_shows_data,
+                        "small_shows": small_shows_data,
+                    }
+                }
+            )
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
