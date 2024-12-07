@@ -1,3 +1,4 @@
+import re
 import pytz
 from bs4 import BeautifulSoup
 import base64
@@ -144,45 +145,67 @@ def get_github_file(path):
         },
     )
     if response.status_code == 404:
-        return "File not found", 404
-    return base64.b64decode(response.json()["content"]).decode("utf-8")
+        raise FileNotFoundError(f"File {path} not found")
+    return response.json()
+
+
+def parse_github_content(content):
+    return base64.b64decode(content).decode("utf-8")
 
 
 @app.route("/api/write-note", methods=["POST"])
-def write_github_file():
+def write_github_file_route():
     data = json.loads(request.get_data(as_text=True))
-    content = data.get("content")
-    today = datetime.now(pytz.timezone("America/Los_Angeles")).strftime("%Y-%m-%d")
-    path = f"Periodic/Daily/{today}.md"
-    existing_content = get_github_file(path)
-    new_content = existing_content + "\n\n" + content
+    return write_github_file(data.get("filepath"), data.get("content"))
+
+
+def write_github_file(filepath, content, sha=None):
     response = requests.put(
-        f"https://api.github.com/repos/JasonBenn/notes/contents/{path}",
+        f"https://api.github.com/repos/JasonBenn/notes/contents/{filepath}",
         headers={
             "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
             "X-GitHub-Api-Version": "2022-11-28", 
             "Accept": "application/vnd.github+json",
         },
         json={
-            "message": f"Update {path}",
-            "content": base64.b64encode(new_content.encode()).decode(),
-            # Get the current SHA to update the file
-            "sha": requests.get(
-                f"https://api.github.com/repos/JasonBenn/notes/contents/{path}",
-                headers={
-                    "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
-                    "X-GitHub-Api-Version": "2022-11-28",
-                    "Accept": "application/vnd.github+json",
-                }
-            ).json()["sha"]
+            "message": f"Update {filepath}",
+            "content": base64.b64encode(content.encode()).decode(),
+            "sha": sha if sha is not None else get_github_file(filepath)["sha"]
         }
     )
     if response.status_code == 404:
-        return f"File {path} not found", 404
+        return f"File {filepath} not found", 404
     elif response.status_code not in [200, 201]:
         return f"Failed to write file: {response.text}", response.status_code
     return response.json()
 
+
+@app.route("/api/append-log", methods=["POST"])
+def append_log_route():
+    data = json.loads(request.get_data(as_text=True))
+    return append_log(data.get("title"), data.get("content"), data.get("filename"), data.get("date"))
+
+
+def append_log(title, content, filename=None, date=None):
+    if date is None:
+        date = datetime.now(pytz.timezone("America/Los_Angeles")).strftime("%Y-%m-%d")
+
+    todays_note_filepath = "Periodic/Daily/" + date + ".md"
+    filepath = todays_note_filepath if filename is None else "Logs/" + filename + ".md"
+    try:
+        response = get_github_file(filepath)
+    except FileNotFoundError:
+        response = get_github_file(todays_note_filepath)
+
+    lines = parse_github_content(response["content"]).split("\n")
+
+    pattern = re.compile(r"^### \[\[(\d{4}-\d{2}-\d{2})\]\]")
+    for i, line in enumerate(lines):
+        if pattern.match(line.strip()):
+            break
+    
+    lines.insert(i, f"### [[{date}]] {title}\n{content}")
+    return write_github_file(filepath, "\n".join(lines), sha=response["sha"])
 
 
 @app.route("/api/goals", methods=["GET"])
