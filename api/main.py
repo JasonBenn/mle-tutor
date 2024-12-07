@@ -1,3 +1,4 @@
+import pytz
 from bs4 import BeautifulSoup
 import base64
 from enum import Enum
@@ -142,7 +143,46 @@ def get_github_file(path):
             "Accept": "application/vnd.github+json",
         },
     )
+    if response.status_code == 404:
+        return "File not found", 404
     return base64.b64decode(response.json()["content"]).decode("utf-8")
+
+
+@app.route("/api/write-note", methods=["POST"])
+def write_github_file():
+    data = json.loads(request.get_data(as_text=True))
+    content = data.get("content")
+    today = datetime.now(pytz.timezone("America/Los_Angeles")).strftime("%Y-%m-%d")
+    path = f"Periodic/Daily/{today}.md"
+    existing_content = get_github_file(path)
+    new_content = existing_content + "\n\n" + content
+    response = requests.put(
+        f"https://api.github.com/repos/JasonBenn/notes/contents/{path}",
+        headers={
+            "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
+            "X-GitHub-Api-Version": "2022-11-28", 
+            "Accept": "application/vnd.github+json",
+        },
+        json={
+            "message": f"Update {path}",
+            "content": base64.b64encode(new_content.encode()).decode(),
+            # Get the current SHA to update the file
+            "sha": requests.get(
+                f"https://api.github.com/repos/JasonBenn/notes/contents/{path}",
+                headers={
+                    "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
+                    "X-GitHub-Api-Version": "2022-11-28",
+                    "Accept": "application/vnd.github+json",
+                }
+            ).json()["sha"]
+        }
+    )
+    if response.status_code == 404:
+        return f"File {path} not found", 404
+    elif response.status_code not in [200, 201]:
+        return f"Failed to write file: {response.text}", response.status_code
+    return response.json()
+
 
 
 @app.route("/api/goals", methods=["GET"])
