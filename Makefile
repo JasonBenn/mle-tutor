@@ -6,3 +6,6 @@ sync_once:
 
 test_api:
 	curl http://127.0.0.1:5000/api/random-text
+
+run:
+	. venv/bin/activate && python api/main.py

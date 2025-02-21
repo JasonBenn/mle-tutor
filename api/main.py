@@ -13,8 +13,19 @@ from flask import Flask, jsonify, request
 import requests
 import asyncio
 import aiohttp
+import logging
 
 from dotenv import load_dotenv  # type: ignore
+
+# Set up logging at the top of the file, after imports
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -45,26 +56,29 @@ def random_text():
 
 @app.route("/api/echo", methods=["GET", "POST"])
 def echo():
-    # Print entire HTTP request
-    print("Request Method:", request.method)
-    print("Request Headers:", request.headers)
-    print("Request URL:", request.url)
-    print("Request Body:", request.get_data(as_text=True))
-    # Return a 201 status code
+    # Log entire HTTP request
+    logger.info("Echo request received",
+        extra={
+            "method": request.method,
+            "url": request.url,
+            "headers": dict(request.headers),
+            "body": request.get_data(as_text=True)
+        }
+    )
     return "", 201
 
 
 class DeckIds(Enum):
-    MACHINE_LEARNING = "rJvG6PtI"
-    DISTRIBUTED_SYSTEMS = "dvQBuvKL"
-    OPERATING_SYSTEMS = "7NCM3TQE"
-    SYSTEM_DESIGN = "GOSfjUYP"
+    ML_THEORY = "rJvG6PtI"
     PYTHON = "TWEo8eCJ"
-    JAVASCRIPT = "vVo0I5hQ"
+    PYTORCH = "cRm6jshY"
     NETWORKING = "PfIYqVVy"
+    OPERATING_SYSTEMS = "7NCM3TQE"
+    DISTRIBUTED_SYSTEMS = "dvQBuvKL"
     ARCHITECTURE = "MNDlT8v4"
     DATABASES = "jn4udgEj"
-    PYTORCH = "cRm6jshY"
+    SYSTEM_DESIGN = "Cr7ZvNQX"
+    JAVASCRIPT = "vVo0I5hQ"
 
     def get_by_name(name) -> Optional[str]:
         for deck in DeckIds:
@@ -118,9 +132,10 @@ def update_card():
 def delete_card():
     data = json.loads(request.get_data(as_text=True))
     response = requests.delete(f"https://app.mochi.cards/api/cards/{data['card_id']}", auth=(os.getenv("MOCHI_API_KEY"), ""))
-    print(response.text)
+    logger.info(f"Delete card response: {response.text}")
 
     if response.status_code not in [201, 200]:
+        logger.error(f"Failed to delete card: {response.text}")
         return jsonify({"error": response.text}), 500
     return jsonify({"response": response.text}), 200
 
@@ -164,14 +179,14 @@ def write_github_file(filepath, content, sha=None):
         f"https://api.github.com/repos/JasonBenn/notes/contents/{filepath}",
         headers={
             "Authorization": f"Bearer {os.getenv('GITHUB_RW_NOTES_TOKEN')}",
-            "X-GitHub-Api-Version": "2022-11-28", 
+            "X-GitHub-Api-Version": "2022-11-28",
             "Accept": "application/vnd.github+json",
         },
         json={
             "message": f"Update {filepath}",
             "content": base64.b64encode(content.encode()).decode(),
-            "sha": sha if sha is not None else get_github_file(filepath)["sha"]
-        }
+            "sha": sha if sha is not None else get_github_file(filepath)["sha"],
+        },
     )
     if response.status_code == 404:
         return f"File {filepath} not found", 404
@@ -203,14 +218,13 @@ def append_log(title, content, filename=None, date=None):
     for i, line in enumerate(lines):
         if pattern.match(line.strip()):
             break
-    
+
     lines.insert(i, f"### [[{date}]] {title}\n{content}")
     return write_github_file(filepath, "\n".join(lines), sha=response["sha"])
 
 
 @app.route("/api/goals", methods=["GET"])
 def goals():
-    print("goals!")
     now = datetime.now()
     month = now.month
     quarter = (month - 1) // 3 + 1
@@ -236,7 +250,7 @@ def goals():
             case _:
                 return jsonify({"error": "Invalid period: should be any combination of [day, week, month, quarter, year]"}), 400
 
-        results[period] = get_github_file(path)
+        results[period] = parse_github_content(get_github_file(path)["content"])
 
     return jsonify({"results": results})
 
@@ -275,7 +289,13 @@ async def get_comedy_events():
             )
 
     except Exception as e:
+        logger.error(f"Error fetching comedy events: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/spotify/callback")
+def spotify_callback():
+    return "Spotify callback successful", 200
 
 
 if __name__ == "__main__":
